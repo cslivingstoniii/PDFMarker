@@ -1,0 +1,13 @@
+{
+  "name": "pdfviewer",
+  "version": "1.0.0",
+  "description": "odf viewer application to test canvas and mouse captures",
+  "main": "index.html",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "lite-server"
+  },
+  "author": "Steve Livingston",
+  "license": "ISC"
+}
