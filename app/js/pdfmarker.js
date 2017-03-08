@@ -1,58 +1,60 @@
-// Grab the canvs and the context
-var canvas = document.getElementById('the-canvas');
-var context = canvas.getContext('2d');
-var imageData = context.getImageData(0,0,canvas.width,canvas.height);
-var initialClick = false;
-var initialCoords = { x: 0, y: 0 };
-var tempRectangle = { x1: 0, y1: 0, x2: 0, y2: 0 };
 var rectangles = [];
 
-function getMousePos(canvas, evt) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-    };
-}
-function drawCircle(centerX, centerY) {
-    context.beginPath();
-    context.arc(centerX, centerY, 5, 0, 2 * Math.PI, false);
-    context.fillStyle = 'green';
-    context.fill();
-    context.lineWidth = 5;
-    context.strokeStyle = '#003300';
-    context.stroke();
-}
-function drawRectangle(tempRectangle){
-    context.rect(tempRectangle.x1, tempRectangle.y1, tempRectangle.x2, tempRectangle.y2);
-    context.stroke();
-}
-canvas.addEventListener('click', function(evt) {
-    var mousePos = getMousePos(canvas, evt);
-    if(initialClick){
-        tempRectangle = { x1: tempRectangle.x1, y1: tempRectangle.y1, x2: mousePos.x, y2: mousePos.y };
-        context.putImageData(imageData, 0, 0);
-        rectangles.push(tempRectangle);
-        drawRectangle(tempRectangle);
-        tempRectangle = { x1: mousePos.x, y1: mousePos.y, x2: mousePos.x, y2: mousePos.y };
-        imageData = context.getImageData(0,0,canvas.width,canvas.height);
-    } else {
-        tempRectangle = { x1: mousePos.x, y1: mousePos.y, x2: mousePos.x, y2: mousePos.y };
-        drawCircle(mousePos.x, mousePos.y);
-        imageData = context.getImageData(0,0,canvas.width,canvas.height);
-    }
-    initialClick = !initialClick;
-}, false);
-canvas.addEventListener('mousemove', function(evt) {
-    var mousePos = getMousePos(canvas, evt);
-    if(initialClick){
-        tempRectangle = { x1: tempRectangle.x1, y1: tempRectangle.y1, x2: mousePos.x, y2: mousePos.y };
-        context.putImageData(imageData, 0, 0);
-        drawRectangle(tempRectangle);
-    } else {
+$(document).ready(function(){
+  $("#grid").mousedown(function (e) {
+       
+        $("#big-ghost").remove();
+        $(".ghost-select").addClass("ghost-active");
+        $(".ghost-select").css({
+            'left': e.pageX,
+            'top': e.pageY
+        });
 
+        initialW = e.pageX;
+        initialH = e.pageY;
+
+        $(document).bind("mouseup", dropSelector);
+        $(document).bind("mousemove", openSelector);
+    });
+  
+  
+});
+
+function dropSelector(e) {
+    $(document).unbind("mousemove", openSelector);
+    $(document).unbind("mouseup", dropSelector);
+
+    rectangles.push({ x1: initialW, y1: initialH, x2: e.pageX, y2: e.pageY});
+    console.log(rectangles);
+}
+
+function openSelector(e) {
+    var w = Math.abs(initialW - e.pageX);
+    var h = Math.abs(initialH - e.pageY);
+
+    $(".ghost-select").css({
+        'width': w,
+        'height': h
+    });
+    if (e.pageX <= initialW && e.pageY >= initialH) {
+        $(".ghost-select").css({
+            'left': e.pageX
+        });
+    } else if (e.pageY <= initialH && e.pageX >= initialW) {
+        $(".ghost-select").css({
+            'top': e.pageY
+        });
+    } else if (e.pageY < initialH && e.pageX < initialW) {
+        $(".ghost-select").css({
+            'left': e.pageX,
+            "top": e.pageY
+        });
     }
-}, false);
+}
+
+// Grab the canvas and the context
+var canvas = document.getElementById('pdfCanvas');
+var context = canvas.getContext('2d');
 
 // If absolute URL from the remote server is provided, configure the CORS
 // header on that server.
